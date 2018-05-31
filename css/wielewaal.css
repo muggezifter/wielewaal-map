@@ -96,59 +96,128 @@
        url('/fonts/Source-Sans-Pro-700/Source-Sans-Pro-700.svg#SourceSansPro') format('svg');
 }
 
+
 body {
     background-color: #303030;
-}
-#controls {
-  float: left;
-}
-#log {
-  font-family: 'Source Code Pro';
-  color: white;
-}
-#log {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-#map { 
-  float: right 
+    margin: 0;
+    padding: 2vw;
 }
 
+#controls {
+  padding-top: 2vw;
+  position: relative;
+}
+
+#log {
+  font-family: 'Source Code Pro';
+  color: greenyellow;
+  list-style-type: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+}
+
+#map { 
+  /* float: right  */
+}
+
+button {
+  border: 0;
+  padding: 4px 6px 2px;
+  background-color: #303030;
+  color: greenyellow;
+}
+button:disabled{
+  color: lightgray;
+}
+
+#select_recs {
+  outline: 0;
+  border: 0;
+  width: 200px;
+  margin-right: 2em;
+  font-family: 'Source Code Pro';
+  color: greenyellow;
+  background-color:  #303030;
+ 
+}
+
+#select_recs:focus {
+  outline: 0;
+}
+
+#btn_play {
+  
+}
 #svg1 {
-    width: 1000px;
+    /* width: 1000px; */
+  width: 96vw;
 }
 
 .map-background {
-    fill: #303030;
-    stroke: none;
-  }
-
-  .building-block {
-fill: #ffe680;
-stroke: #F3D6B6;
-    stroke-width: 0;
-  }
-
-  .node {
-    stroke: white;
-    fill: #303030;
-    stroke-width: 0.1pt;
-  }
-
-  .pointer {
-    stroke: yellow;
-    fill: yellow;
-    stroke-width: 0;
-  }
-
-.pointer.last {
-stroke: red;
-fill: red;
+  fill: #303030;
+  stroke: none;
 }
 
+.building-block {
+  fill: #ffe680;
+  stroke: #F3D6B6;
+  stroke-width: 0;
+}
 
-  .grid {
-    stroke: white;
-    stroke-width: 0.1pt;
-  }
+.node {
+  fill: #303030;
+}
+
+.pointer {
+  stroke: aquamarine;
+  fill: aquamarine;
+  stroke-width: 0;
+}
+
+.pointer.last {
+  stroke: red;
+  fill: red;
+}
+
+.grid {
+  stroke: greenyellow;
+  stroke-width: 0.15pt;
+}
+
+#histogram {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-top: 20px;
+  width: 400px;
+  height: 200px;
+}
+
+#histogram  div.bar {
+  width: 100px;
+  height: 100%;
+  /*display: inline-block;*/
+  display: none;
+  position: relative;
+  margin: 0 4px;
+}
+
+.fill {
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  bottom: 0;
+}
+
+#bar60 .fill { background-color: #ff5050;}
+#bar61 .fill { background-color: #ff9933;}
+#bar62 .fill { background-color: #ffff00;}
+#bar63 .fill { background-color: #99ff33;}
+#bar64 .fill { background-color: #33cc33;}
+#bar65 .fill { background-color: #00ff99;}
+#bar66 .fill { background-color: #33cccc;}
+#bar67 .fill { background-color: #0099ff;}
+#bar68 .fill { background-color: #3366ff;}
+#bar69 .fill { background-color: #9966ff;}
+#bar70 .fill { background-color: #ff00ff;}
+#bar71 .fill { background-color: #ff3399;}

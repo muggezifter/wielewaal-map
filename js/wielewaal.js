@@ -1,71 +1,219 @@
 
 (function(){
-    const pointerLayer = document.getElementById("pointer");
-    const LOG_LENGTH = 5;
+    const POINTER_LAYER = document.getElementById('pointer');
+    const LOG_LENGTH = 10;
+
+    //const SVG_W = 159.515
+    //const SVG_H = 164.72
+    const SVG_H = 159.515;
+    const SVG_W = 164.7;
+
+    const MIN_LAT = 51.87535;
+    const MAX_LAT = 51.885209;
+
+    const MIN_LON = 4.45263;
+    const MAX_LON = 4.469102;
+
+    //const MIN_LAT = 51.87535;
+    //const MAX_LAT = 51.885209;
+    //const MIN_LON = 4.45263;
+    //const MAX_LON = 4.469102;
+
+
+    const LAT_H = MAX_LAT - MIN_LAT;
+    const LON_W = MAX_LON - MIN_LON;
+
+    var messages = [];
+    var currentTrack = [];
+    var lastIndex = 0;
+    var currentIndex = 0;
+    var pausedIndex = 0;
+    var timeOut = null;
+    var speed = 10;
+    var bearing = 0;
+
     loadData(); 
 
-    var cnt = 0;
+    $("#btn_play").prop("disabled", true).click(btnPlayClickHandler);
+    $("#btn_pause").prop("disabled", true).click(btnPauseClickHandler);
+    $("#btn_stop").prop("disabled", true).click(btnStopClickHandler);
+    
+    $('#select_recs').change(selectRecsChangeHandler);
+
+    $("#bar60").css("display","inline-block");
+    $("#bar62").css("display","inline-block");
+    $("#bar69").css("display","inline-block");
+
+    function selectRecsChangeHandler() {
+        btnStopClickHandler();
+        $('#select_recs').children('.default').remove();
+        log("recording selected: " + $('#select_recs').find(":selected").text());
+        $.getJSON('/recording/find?rec_id=' + $('#select_recs').val() + '&callback=?').done( (data) => {
+            stopPlaying();
+            currentTrack = data;
+            lastIndex = Math.max(0,currentTrack.length-1)
+            $("#btn_play").prop("disabled", false);
+            log("recording " + $('#select_recs').val() + " retrieved");
+        });
+    }
+
+    function btnPlayClickHandler() {
+        $("#btn_play").prop("disabled", true);
+        $("#btn_pause").prop("disabled", false);
+        $("#btn_stop").prop("disabled", false);
+        if (pausedIndex > 0) {
+            log("resume playback");
+            playNext(pausedIndex);
+            pausedIndex = 0;
+        } else {
+            removeAllPoints()
+            playNext(1);
+        }
+    }
+
+    function btnPauseClickHandler() {
+        $("#btn_play").prop("disabled", false);
+        $("#btn_pause").prop("disabled", true);
+        $("#btn_stop").prop("disabled", false);
+        clearTimeout(timeOut);
+        pausedIndex = currentIndex;
+        log("playback paused");
+    }
+
+    function btnStopClickHandler() {
+        $("#btn_play").prop("disabled", false);
+        $("#btn_pause").prop("disabled", true);
+        $("#btn_stop").prop("disabled", true);
+        clearTimeout(timeOut);
+        pausedIndex = 0;
+        currentIndex = 0;
+        log("stop playback");
+    }
+
+    function getBearing(lat, lon, latNxt, lonNxt) {     
+        
+        start_latitude  = lat * Math.PI / 180;
+        start_longitude = lon * Math.PI / 180;
+        stop_latitude   = latNxt * Math.PI / 180;
+        stop_longitude  = lonNxt * Math.PI / 180;
+
+        var y = Math.sin(stop_longitude-start_longitude) * Math.cos(stop_latitude);
+        var x = Math.cos(start_latitude)*Math.sin(stop_latitude) -
+                Math.sin(start_latitude)*Math.cos(stop_latitude)*Math.cos(stop_longitude-start_longitude);
+        return Math.atan2(y, x) * 180 / Math.PI;
+    }
+
+    function playNext(index) {
+        currentIndex = index;
+        const pnt = currentTrack[index];
+        resetAllPoints();
+        drawPoint(pnt);
+        playChord(pnt.chord);
+        log("playing point " + index);
+        if (index < lastIndex) {
+            // get interval
+            const nxt = currentTrack[index + 1];
+            const dNow = new Date(pnt.date);
+            const dNxt = new Date(nxt.date);
+            const interval = Math.min(15000,(dNxt - dNow))/speed;
+            log("interval: " +interval);
+            // bearing
+            bearing = getBearing(pnt.lat,pnt.lon, nxt.lat, nxt.lon)
+            timeOut = setTimeout(() => playNext(index+1), interval);
+        } else {
+            btnStopClickHandler();
+            log("end");
+        }
+        log("bearing: " + bearing)
+    }
+
+
+
+    function drawPoint(point) {
+        //console.log(point);
+        const x = SVG_W * (parseFloat(point.lon) - MIN_LON)/LON_W
+        const y = SVG_H - (SVG_H * (parseFloat(point.lat) - MIN_LAT)/LAT_H )
+        //print '<circle cx="'+ str(x) + '" cy="'+ str(y) +'" r="0.6" class="node" id="midi' + note + '" />'
+
+        const c = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+        c.setAttribute("r", "0.8");
+        c.setAttribute("cx",x);
+        c.setAttribute("cy",y);
+        c.setAttribute("id",point.id)
+        c.classList.add("pointer");
+        c.classList.add("last")
+        POINTER_LAYER.appendChild(c);
+    }
+
+    function playChord(chord) {
+
+    }
 
     function loadData() {
-        getGridData("G0004");
-        //setInterval(()=>log("hallo" + cnt++),1000);
+        getGridData('G0004');
+        //setInterval(()=>log('hallo' + cnt++),1000);
     } 
 
-    function  getGridData(gridId) {
-        $.getJSON("/grid/find?grid_id=" + gridId + "&callback=?")
+    function stopPlaying() {
+    
+    }
+
+
+    function getGridData(gridId) {
+        $.getJSON('/grid/find?grid_id=' + gridId + '&callback=?')
         .done( (data) => {
             currentGrid = data[0];
-            log("loaded grid: " + currentGrid.name);
+            log('loaded grid: ' + currentGrid.name);
             getRecordings(gridId);
         });
     }
 
-    function  getRecordings(gridId)  {
-        $.getJSON("/recording/list?grid_id=" + gridId + "&callback=?")
+    function getRecordings(gridId)  {
+        $.getJSON('/recording/list?grid_id=' + gridId + '&callback=?')
         .done(function (data) {
             const recordings = data.filter((rec) => rec.description.length>1);
-            log("found " + recordings.length + " recordings");
+            log('found ' + recordings.length + ' recordings');
             for (var rec of recordings) {
-                log(rec.recording_id + ": " + rec.description);
+                log(rec.recording_id + ': ' + rec.description);
             }
-            addOptions("select#play_select",recordings,"description", "recording_id");
+            addOptions('select#select_recs',recordings,'description', 'recording_id');
         });
     }
 
-    function  addOptions(select,data,name,value)  {
-        log("populating dropdown... done")
-        $(select)
-            .children(".dynamic")
-            .remove();
+    function addOptions(select,data,name,value)  {
+        log('populating dropdown')
         for (var item of data) {
             $(select).append(
-                    $('<option>', { class: "dynamic", value:item[value] })
+                    $('<option>', { value:item[value] })
                     .text(item[name])
             );
-        }  
+        } 
+
     };
 
-    var messages = [];
+
     function log(message) {
-        messages.push(message);
+        messages.push('' + message);
         messages = messages.slice(0-LOG_LENGTH);
-        document.getElementById("log").innerHTML = messages.reduce(
-            (acc,val) => acc + "<li>" + val + "</li>",
-        "");
-        //console.log(messages);
+        document.getElementById('log').innerHTML = messages.reduce(
+            (acc,val) => acc + '<li>' + val + '</li>',
+        '');
+
     }
+
             
-    function removeChildren(parent) {
-        while(parent.firstChild) {
-            console.log(parent.firstChild);
-            parent.removeChild(parent.firstChild);
+    function removeAllPoints() {
+        while(POINTER_LAYER.firstChild) {
+            //console.log(parent.firstChild);
+            POINTER_LAYER.removeChild(POINTER_LAYER.firstChild);
         }
     }
         
     function resetAllPoints() {
-        const points = document.getElementsByClassName("pointer last");
+        const points = document.getElementsByClassName('pointer last');
         for (var point of points){
-            point.classList.remove("last");
+            point.classList.remove('last');
+            point.setAttribute("r","0.5");
         }
     }
 })()

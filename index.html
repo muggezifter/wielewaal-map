@@ -4,16 +4,10 @@
         <meta charset="utf-8"/>
         <title>Wielewaal</title>
         <link rel="stylesheet" href="/css/wielewaal.css">
-
+        <link rel="stylesheet" href="/css/font-awesome.css">
 
     </head>
     <body>
-      <div id="controls">
-        <!--button id="btnLoad">load</button-->
-        <select id="play_select"></select>
-        <ul id="log">
-        </ul>
-      </div>
       <div id="map">
             <svg xmlns="http://www.w3.org/2000/svg" 
             xmlns:svg="http://www.w3.org/2000/svg" 
@@ -1645,11 +1639,7 @@
                  clip-path="url(#map-clipping)"
                  inkscape:groupmode="layer"
                  inkscape:label="Pointer"
-                 transform="translate(0,0)">
-                <circle cx="50" cy="55" r="0.6" class="pointer" id="point1" />
-              
-                 <circle cx="50" cy="50" r="0.6" class="pointer last" id="point2" />
-              </g>
+                 transform="translate(0,0)"></g>
               <g
                  id="grid"
                  clip-path="url(#map-clipping)"
@@ -1692,22 +1682,47 @@
                     x2="135.34" y2="50.3024784461"
                     class="grid" id="68_60" />
             
-                    <circle cx="13.7" cy="152.23416523" r="1" class="node" id="midi64" />
-                    <circle cx="29.38" cy="109.212521554" r="1" class="node" id="midi67" />
-                    <circle cx="45.06" cy="66.1779341718" r="1" class="node" id="midi70" />
-                    <circle cx="60.74" cy="23.1692342023" r="1" class="node" id="midi61" />
+                    <circle cx="13.7" cy="152.23416523" r="1" class="grid node" id="midi64" />
+                    <circle cx="29.38" cy="109.212521554" r="1" class="grid node" id="midi67" />
+                    <circle cx="45.06" cy="66.1779341718" r="1" class="grid node" id="midi70" />
+                    <circle cx="60.74" cy="23.1692342023" r="1" class="grid node" id="midi61" />
             
-                    <circle cx="58.84" cy="144.289965514" r="1" class="node" id="midi71" />
-                    <circle cx="74.52" cy="101.268321838" r="1" class="node" id="midi62" />
-                    <circle cx="90.2" cy="58.2466781621" r="1" class="node" id="midi65" />
-                    <circle cx="105.88" cy="15.2250344863" r="1" class="node" id="midi68" />
+                    <circle cx="58.84" cy="144.289965514" r="1" class="grid node" id="midi71" />
+                    <circle cx="74.52" cy="101.268321838" r="1" class="grid node" id="midi62" />
+                    <circle cx="90.2" cy="58.2466781621" r="1" class="grid node" id="midi65" />
+                    <circle cx="105.88" cy="15.2250344863" r="1" class="grid node" id="midi68" />
             
-                    <circle cx="103.98" cy="136.345765798" r="1" class="node" id="midi66" />
-                    <circle cx="119.66" cy="93.3241221219" r="1" class="node" id="midi69" />
-                    <circle cx="135.34" cy="50.3024784461" r="1" class="node" id="midi60" />
-                    <circle cx="151.02" cy="7.28083477027" r="1" class="node" id="midi63" />
+                    <circle cx="103.98" cy="136.345765798" r="1" class="grid node" id="midi66" />
+                    <circle cx="119.66" cy="93.3241221219" r="1" class="grid node" id="midi69" />
+                    <circle cx="135.34" cy="50.3024784461" r="1" class="grid node" id="midi60" />
+                    <circle cx="151.02" cy="7.28083477027" r="1" class="grid node" id="midi63" />
                 </g>
             </svg>
+          </div>
+          <div id="controls">
+            <!--button id="btnLoad">load</button-->
+            <select id="select_recs">
+              <option class="default">select a recording...</option>
+            </select>
+            <button id="btn_play"><i class="fa fa-play"></i></button>
+            <button id="btn_pause"><i class="fa fa-pause"></i></button>
+            <button id="btn_stop"><i class="fa fa-stop"></i></button>
+            <ul id="log">
+            </ul>
+            <div id = "histogram">
+              <div class="bar" id="bar60" ><div class="fill"></div></div>
+              <div class="bar" id="bar61" ><div class="fill"></div></div>
+              <div class="bar" id="bar62" ><div class="fill"></div></div>
+              <div class="bar" id="bar63" ><div class="fill"></div></div> 
+              <div class="bar" id="bar64" ><div class="fill"></div></div>
+              <div class="bar" id="bar65" ><div class="fill"></div></div>
+              <div class="bar" id="bar66" ><div class="fill"></div></div>
+              <div class="bar" id="bar67" ><div class="fill"></div></div> 
+              <div class="bar" id="bar68" ><div class="fill"></div></div>
+              <div class="bar" id="bar69" ><div class="fill"></div></div> 
+              <div class="bar" id="bar70" ><div class="fill"></div></div>
+              <div class="bar" id="bar71" ><div class="fill"></div></div> 
+            </div>
           </div>
         <script type="text/javascript" src="/js/jquery-2.2.0.min.js"></script>
         <script type="text/javascript" src="/js/wielewaal.js"></script>
