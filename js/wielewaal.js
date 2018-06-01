@@ -1,6 +1,7 @@
 
 (function(){
     const POINTER_LAYER = document.getElementById('pointer');
+    const MAP_DIV = document.getElementById('map');
     const LOG_LENGTH = 10;
 
     //const SVG_W = 159.515
@@ -29,8 +30,11 @@
     var currentIndex = 0;
     var pausedIndex = 0;
     var timeOut = null;
-    var speed = 10;
+    var speed = 1;
+    var volume = 1 
     var bearing = 0;
+    var logInConsole = true;
+
 
     loadData(); 
 
@@ -39,22 +43,22 @@
     $("#btn_stop").prop("disabled", true).click(btnStopClickHandler);
     
     $('#select_recs').change(selectRecsChangeHandler);
-
-    $("#bar60").css("display","inline-block");
-    $("#bar62").css("display","inline-block");
-    $("#bar69").css("display","inline-block");
+    $('#select_speed').change(selectSpeedChangeHandler);
 
     function selectRecsChangeHandler() {
         btnStopClickHandler();
         $('#select_recs').children('.default').remove();
         log("recording selected: " + $('#select_recs').find(":selected").text());
         $.getJSON('/recording/find?rec_id=' + $('#select_recs').val() + '&callback=?').done( (data) => {
-            stopPlaying();
             currentTrack = data;
-            lastIndex = Math.max(0,currentTrack.length-1)
+            lastIndex = Math.max(0,currentTrack.length-1);
             $("#btn_play").prop("disabled", false);
             log("recording " + $('#select_recs').val() + " retrieved");
         });
+    }
+
+    function selectSpeedChangeHandler() {
+        speed = $('#select_speed').val();
     }
 
     function btnPlayClickHandler() {
@@ -85,6 +89,7 @@
         $("#btn_pause").prop("disabled", true);
         $("#btn_stop").prop("disabled", true);
         clearTimeout(timeOut);
+        resetHistogram();
         pausedIndex = 0;
         currentIndex = 0;
         log("stop playback");
@@ -109,22 +114,21 @@
         resetAllPoints();
         drawPoint(pnt);
         playChord(pnt.chord);
-        log("playing point " + index);
+        log("point " + index  +", " + pnt.date);
+        log(pnt.chord.map((val)=>"note: " + midi2note(val.note) + ", vel: " + val.velocity).join(" | "));
         if (index < lastIndex) {
             // get interval
             const nxt = currentTrack[index + 1];
             const dNow = new Date(pnt.date);
             const dNxt = new Date(nxt.date);
             const interval = Math.min(15000,(dNxt - dNow))/speed;
-            log("interval: " +interval);
             // bearing
-            bearing = getBearing(pnt.lat,pnt.lon, nxt.lat, nxt.lon)
+            //bearing = getBearing(pnt.lat,pnt.lon, nxt.lat, nxt.lon)
             timeOut = setTimeout(() => playNext(index+1), interval);
         } else {
             btnStopClickHandler();
             log("end");
         }
-        log("bearing: " + bearing)
     }
 
 
@@ -146,16 +150,33 @@
     }
 
     function playChord(chord) {
-
+        histogram(chord);
+        setClasses(chord);
+        for (var n of chord) {
+            $.getJSON("/play?n=" + n.note + "&v=" + volume*n.velocity + "&callback=?").done(function (data) {
+                logInConsole && console.log(data);
+            });
+        }
     }
 
     function loadData() {
         getGridData('G0004');
-        //setInterval(()=>log('hallo' + cnt++),1000);
     } 
 
-    function stopPlaying() {
-    
+    function setClasses(chord) {
+        const classList = chord.map((val)=>"m" + val.note).join(' ');
+        MAP_DIV.classList = classList;
+    }
+
+    function histogram(chord) {
+        resetHistogram();
+        for (var n of chord) {
+            $("#bar" + n.note).css("display","inline-block").find(".fill").css("height",(100 * n.velocity/127)+"%");
+        }
+    }
+
+    function resetHistogram() {
+        $(".bar").css("display","none");
     }
 
 
@@ -215,5 +236,10 @@
             point.classList.remove('last');
             point.setAttribute("r","0.5");
         }
+    }
+
+    function midi2note(midi) {
+        return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 
+        'G', 'G#', 'A', 'A#', 'B'][midi % 12] 
     }
 })()

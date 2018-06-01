@@ -125,24 +125,33 @@ button {
   padding: 4px 6px 2px;
   background-color: #303030;
   color: greenyellow;
-}
-button:disabled{
-  color: lightgray;
+  opacity: 0.8;
 }
 
-#select_recs {
+button:disabled{
+  opacity: 0.3;
+  /*color: lightgray;*/
+}
+
+select {
   outline: 0;
-  border: 0;
-  width: 200px;
-  margin-right: 2em;
+  border: 1px solid greenyellow;
   font-family: 'Source Code Pro';
   color: greenyellow;
   background-color:  #303030;
- 
+  font-size: 1rem;
+}
+
+#select_recs {
+  width: 225px;
 }
 
 #select_recs:focus {
   outline: 0;
+}
+
+#select_speed {
+  margin-right: 2em;
 }
 
 #btn_play {
@@ -188,36 +197,80 @@ button:disabled{
   position: absolute;
   right: 0;
   top: 0;
-  margin-top: 20px;
-  width: 400px;
+  margin-top: 40px;
+  width: 300px;
   height: 200px;
 }
 
-#histogram  div.bar {
-  width: 100px;
+#histogram .bar {
+  width: 60px;
   height: 100%;
   /*display: inline-block;*/
   display: none;
   position: relative;
-  margin: 0 4px;
+  margin: 0 10px;
 }
 
-.fill {
+#histogram .fill {
   width: 100%;
   height: 50%;
   position: absolute;
-  bottom: 0;
+  bottom: 0px;
+  opacity:  0.8;
+}
+#histogram .label {
+  width: 100%;
+  height: 20px;
+  position: absolute;
+  bottom: -22px;
+  text-align: center;
+  color: greenyellow;
+  font-family: 'Source Code Pro';
+}
+
+label {
+  color: greenyellow;
+  font-family: 'Source Code Pro';
+}
+
+#cb_repeat {
+  background-color: greenyellow;
+  margin: 0 0 0 20px;
 }
 
 #bar60 .fill { background-color: #ff5050;}
+.m60 #midi60 { fill: #ff5050;}
+
 #bar61 .fill { background-color: #ff9933;}
+.m61 #midi61 { fill: #ff9933; } 
+
 #bar62 .fill { background-color: #ffff00;}
+.m62 #midi62 { fill: #ffff00; } 
+
 #bar63 .fill { background-color: #99ff33;}
+.m63 #midi63 { fill: #99ff33; }
+
 #bar64 .fill { background-color: #33cc33;}
+.m64 #midi64 { fill: #33cc33; }
+
 #bar65 .fill { background-color: #00ff99;}
+.m65 #midi65 { fill: #00ff99; }
+
 #bar66 .fill { background-color: #33cccc;}
+.m66 #midi66 { fill: #33cccc; }
+
 #bar67 .fill { background-color: #0099ff;}
+.m67 #midi67 { fill: #0099ff; }
+
 #bar68 .fill { background-color: #3366ff;}
+.m68 #midi68 { fill: #3366ff; }
+
 #bar69 .fill { background-color: #9966ff;}
+.m69 #midi69 { fill: #9966ff; }
+
 #bar70 .fill { background-color: #ff00ff;}
+.m70 #midi70 { fill: #ff00ff; }
+
 #bar71 .fill { background-color: #ff3399;}
+.m71 #midi71 { fill: #ff3399; }
+
