@@ -15,12 +15,6 @@
     const MIN_LON = 4.45263;
     const MAX_LON = 4.469102;
 
-    //const MIN_LAT = 51.87535;
-    //const MAX_LAT = 51.885209;
-    //const MIN_LON = 4.45263;
-    //const MAX_LON = 4.469102;
-
-
     const LAT_H = MAX_LAT - MIN_LAT;
     const LON_W = MAX_LON - MIN_LON;
 
@@ -31,9 +25,10 @@
     var pausedIndex = 0;
     var timeOut = null;
     var speed = 1;
-    var volume = 1 
+    var volume = 0.3 
     var bearing = 0;
-    var logInConsole = true;
+    var logInConsole = false;
+    var mode = "repeat";
 
 
     loadData(); 
@@ -41,9 +36,17 @@
     $("#btn_play").prop("disabled", true).click(btnPlayClickHandler);
     $("#btn_pause").prop("disabled", true).click(btnPauseClickHandler);
     $("#btn_stop").prop("disabled", true).click(btnStopClickHandler);
-    
+
     $('#select_recs').change(selectRecsChangeHandler);
     $('#select_speed').change(selectSpeedChangeHandler);
+    $('#select_mode').change(selectModeChangeHandler);
+
+    $("#range_vol").change(rangeVolChangeHandler);
+
+    function rangeVolChangeHandler() {
+        volume = $("#range_vol").val();
+        logInConsole && console.log(volume)
+    }
 
     function selectRecsChangeHandler() {
         btnStopClickHandler();
@@ -61,10 +64,15 @@
         speed = $('#select_speed').val();
     }
 
+    function selectModeChangeHandler() {
+        mode = $('#btn_mode').val();
+    }
+
     function btnPlayClickHandler() {
         $("#btn_play").prop("disabled", true);
         $("#btn_pause").prop("disabled", false);
         $("#btn_stop").prop("disabled", false);
+
         if (pausedIndex > 0) {
             log("resume playback");
             playNext(pausedIndex);
@@ -75,10 +83,17 @@
         }
     }
 
+    function mute() {
+        $.getJSON("/play?callback=?").done(function (data) {
+            logInConsole && console.log(data);
+        });
+    }
+
     function btnPauseClickHandler() {
         $("#btn_play").prop("disabled", false);
         $("#btn_pause").prop("disabled", true);
         $("#btn_stop").prop("disabled", false);
+        mute();
         clearTimeout(timeOut);
         pausedIndex = currentIndex;
         log("playback paused");
@@ -88,6 +103,7 @@
         $("#btn_play").prop("disabled", false);
         $("#btn_pause").prop("disabled", true);
         $("#btn_stop").prop("disabled", true);
+        mute();
         clearTimeout(timeOut);
         resetHistogram();
         pausedIndex = 0;
@@ -114,7 +130,8 @@
         resetAllPoints();
         drawPoint(pnt);
         playChord(pnt.chord);
-        log("point " + index  +", " + pnt.date);
+        log("point #" + index  +", date: " + pnt.date);
+        log("lat: " + pnt.lat +", lon:" + pnt.lon);
         log(pnt.chord.map((val)=>"note: " + midi2note(val.note) + ", vel: " + val.velocity).join(" | "));
         if (index < lastIndex) {
             // get interval
@@ -127,7 +144,12 @@
             timeOut = setTimeout(() => playNext(index+1), interval);
         } else {
             btnStopClickHandler();
-            log("end");
+            if (mode == "repeat") {
+                log("repeat");
+                btnPlayClickHandler();
+            } else {
+                log("end")
+            }
         }
     }
 
@@ -152,11 +174,9 @@
     function playChord(chord) {
         histogram(chord);
         setClasses(chord);
-        for (var n of chord) {
-            $.getJSON("/play?n=" + n.note + "&v=" + volume*n.velocity + "&callback=?").done(function (data) {
-                logInConsole && console.log(data);
-            });
-        }
+        $.getJSON("/play?" + chord.reduce((a,n)=> a +"n=" + n.note + "&v=" + volume*n.velocity + "&","") + "callback=?").done(function (data) {
+            logInConsole && console.log(data);
+        });
     }
 
     function loadData() {
