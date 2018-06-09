@@ -27,11 +27,27 @@
     var speed = 1;
     var volume = 0.3 
     var bearing = 0;
-    var logInConsole = false;
+    var logInConsole = true;
     var mode = "repeat";
 
 
     loadData(); 
+
+    $("body").bind("keypress",(e)=>{
+        switch(e.which) {
+            case 43: //+
+            case 45: //-
+                changeVolume(e.which);
+                break;
+            case 60: // <
+            case 62: // >
+                changeSpeed(e.which);
+                break;
+
+        }
+    });
+
+
 
     $("#btn_play").prop("disabled", true).click(btnPlayClickHandler);
     $("#btn_pause").prop("disabled", true).click(btnPauseClickHandler);
@@ -42,6 +58,61 @@
     $('#select_mode').change(selectModeChangeHandler);
 
     $("#range_vol").change(rangeVolChangeHandler);
+
+    function changeVolume(c) {
+        const min = 0;
+        const max = 1;
+        const step = 0.1;
+        const current = parseFloat($("#range_vol").val());
+        if(c==43 && current < max) {
+            volume = current + step;
+            logInConsole && console.log("volume up");
+        }
+        if(c==45 && current > min) {
+            volume = current - step;
+            logInConsole && console.log("volume down");
+        }
+        $("#range_vol").val(volume);
+        logInConsole && console.log("volume: " + volume);
+    }
+
+    function changeSpeed(c) {
+        const current = parseInt($("#select_speed").val());
+        var newSpeed = null;
+        if(c==60) {
+            switch(current) {
+                case(2):
+                    newSpeed = 1;
+                    break;
+                case(5):
+                    newSpeed = 2;
+                    break;
+                case(10):
+                    newSpeed = 5;
+                    break;
+            }
+            logInConsole && console.log("speed down: " + newSpeed);
+        } else {
+            switch(current) {
+                case(1):
+                    newSpeed = 2;
+                    break;
+                case(2):
+                    newSpeed = 5;
+                    break;
+                case(5):
+                    newSpeed = 10;
+                    break; 
+            }
+            logInConsole && console.log("speed up: " + newSpeed);
+        }
+        if (newSpeed > 0) {
+            speed = newSpeed;
+            $("#select_speed").val(newSpeed);
+        }
+
+        logInConsole && console.log("speed: " + speed);
+    }
 
     function rangeVolChangeHandler() {
         volume = $("#range_vol").val();
